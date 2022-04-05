@@ -27,16 +27,19 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var helper:DBHelper
     lateinit var adapter: TodoAdapter
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        helper = DBHelper(this@MainActivity,"todo.db",1)
+
 
         init()
         setListener();
     }
 
     private fun init(){
-        helper = DBHelper(this,"todo.db",1)
 
         adapter = TodoAdapter()
 
@@ -55,14 +58,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setListener(){
-        val updatebtn=findViewById<Button>(R.id.recycler.)
-        val deletebtn=findViewById<Button>(R.id.btn_delete)
         val createbtn=findViewById<Button>(R.id.create)
         createbtn.setOnClickListener {
             startActivity(Intent(this, CreateActivity::class.java))
-        }
-        deletebtn.setOnClickListener{
-            Log.i(TAG,findViewById<EditText>( R.id.content).text.toString())
         }
     }
 
@@ -134,15 +132,19 @@ class MainActivity : AppCompatActivity() {
         var btnUpdate: TextView? = null
 
         fun render(todo: Todo) {
+            helper = DBHelper(this@MainActivity,"todo.db",1)
+            val db = helper.writableDatabase
+
             id?.text = todo.id.toString()
             content?.text = todo.content
 
             btnDelete?.setOnClickListener {
-
+                Log.i(TAG,"delete from "+Todo.TABLE+" where "+Todo.COL_ID+"="+todo.id )
+                db.execSQL("delete from "+Todo.TABLE+" where "+Todo.COL_ID+"="+todo.id )
             }
-            btnDelete?.setOnClickListener {
-
-            }
+//            btnDelete?.setOnClickListener {
+//
+//            }
 
 
         }
