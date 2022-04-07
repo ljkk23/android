@@ -77,12 +77,14 @@ class MainActivity : AppCompatActivity() {
                 arr.add(
                     Todo(
                         cursor.getString(cursor.getColumnIndex(Todo.COL_CONTENT)),
-                        cursor.getLong(cursor.getColumnIndex(Todo.COL_TIME)),
+                        cursor.getString(cursor.getColumnIndex(Todo.COL_TIME)),
+                        cursor.getString(cursor.getColumnIndex(Todo.COL_DONE))
                     ).apply {
                         id = cursor.getInt(cursor.getColumnIndex(Todo.COL_ID))
                     }
                 )
-                Log.i(TAG,"arr[0].content");
+                Log.i(TAG,cursor.getString(cursor.getColumnIndex(Todo.COL_DONE))
+                )
             }while (cursor.moveToNext())
         }
 
@@ -101,9 +103,11 @@ class MainActivity : AppCompatActivity() {
                 LayoutInflater.from(parent.context).inflate(R.layout.item_todo, parent, false)
             return TodoViewHolder(view).apply {
                 id = view.findViewById(R.id.id)
+                date=view.findViewById(R.id.date)
                 content = view.findViewById(R.id.content)
                 btnUpdate = view.findViewById(R.id.btn_update)
                 btnDelete = view.findViewById(R.id.btn_delete)
+                btnDone=view.findViewById<Button>(R.id.done)
             }
         }
 
@@ -121,35 +125,85 @@ class MainActivity : AppCompatActivity() {
             notifyDataSetChanged()
         }
 
+
+        fun replaceItem(id: Int?, item: Todo) {
+            val idx = findIdx(id)
+
+            if(idx >= 0) {
+                data.set(idx, item)
+                notifyItemChanged(idx)
+            }
+
+        }
+
+        private fun findIdx(id: Int?): Int {
+            var idx = -1
+            data.forEachIndexed { index, todo ->
+                if(todo.id == id){
+                    idx = index
+                }
+            }
+            return idx
+        }
+
+        fun itemDeleted(id: Int?) {
+            val idx = findIdx(id)
+            if(idx >= 0){
+                data.removeAt(idx)
+                notifyItemRemoved(idx)
+            }
+        }
+
     }
 
     inner class TodoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         var id: TextView? = null
         var content: TextView? = null
+        var date:TextView?=null
 
         var btnDelete: TextView? = null
         var btnUpdate: TextView? = null
+        var btnDone:TextView?=null
 
         fun render(todo: Todo) {
-            helper = DBHelper(this@MainActivity,"todo.db",1)
+//            helper = DBHelper(this@MainActivity,"todo.db",1)
             val db = helper.writableDatabase
 
             id?.text = todo.id.toString()
             content?.text = todo.content
+            date?.text= todo.createTime
+            Log.i(TAG,todo.createTime.toString())
+            btnDone?.text = todo.done
+
 
             btnDelete?.setOnClickListener {
                 Log.i(TAG,"delete from "+Todo.TABLE+" where "+Todo.COL_ID+"="+todo.id )
                 db.execSQL("delete from "+Todo.TABLE+" where "+Todo.COL_ID+"="+todo.id )
+                adapter.itemDeleted(todo.id)
+            //startActivity(Intent(this@MainActivity,this@MainActivity::class.java))
             }
-//            btnDelete?.setOnClickListener {
-//
-//            }
+            btnUpdate?.setOnClickListener {
+                var intent=Intent()
+                intent.setClass(this@MainActivity,InfoActivity::class.java)
+                intent.putExtra("id",todo.id.toString())
+                startActivity(intent)
+            }
+            btnDone?.setOnClickListener{
+                helper = DBHelper(this@MainActivity,"todo.db",1)
+                var db=helper.writableDatabase
+                val cv = ContentValues()
+                cv.put("done","已完成")
+                db.update("Todo",cv,"id=?", arrayOf(todo.id.toString()))
+                //btnDone?.text = "已完成"
+                val item = Todo(todo.content,todo.createTime,"已完成").apply { id=todo.id }
+                adapter.replaceItem(todo.id,item)
+            }
 
 
+            }
         }
 
 
     }
 
-}

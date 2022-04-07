@@ -17,7 +17,8 @@ class DBHelper(
         db.execSQL("CREATE TABLE ${Todo.TABLE} (\n" +
                 "\t${Todo.COL_ID} integer PRIMARY KEY autoincrement,\n" +
                 "\t${Todo.COL_CONTENT} text,\n" +
-                "\t${Todo.COL_TIME} REAL)")
+                "\t${Todo.COL_TIME} text,\n" +
+                "\t${Todo.COL_DONE} text)")
 
     }
 
