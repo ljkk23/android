@@ -13,9 +13,11 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -84,7 +86,7 @@ fun firstPage(navController: NavController) {
             )
         },
         bottomBar = {
-                    navigationBar()
+                    navigationBar(navController)
     },
         content = { innerPadding ->
             Column(
@@ -127,18 +129,18 @@ fun firstPage(navController: NavController) {
                                 .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
                                 .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
                                 .size(55.dp)
-                                .clickable { /*TODO:跳转到榜单*/ }
+                                .clickable { navController.navigate("rankScreen") }
                         )
                         Image(
                             painter = painterResource(id = R.drawable.remen),
-                            contentDescription = "分类",
+                            contentDescription = "推荐",
                             Modifier
                                 .padding(40.dp, 10.dp, 30.dp, 5.dp)
                                 .clip(CircleShape)
                                 .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
                                 .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
                                 .size(55.dp)
-                                .clickable { /*TODO:跳转到推荐*/ }
+                                .clickable { navController.navigate("advScreen") }
                         )
 
                     }
@@ -239,7 +241,7 @@ fun adviceCard(jsonData:JSONObject) {
 }
 
 @Composable
-fun navigationBar() {
+fun navigationBar(navController: NavController) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("主页", "个人")
     NavigationBar() {
@@ -248,11 +250,17 @@ fun navigationBar() {
                 icon = { Icon(
                     Icons.Filled.Favorite,
                     contentDescription = null,
-                    modifier = Modifier.padding(0.dp)
-                ) },
+                    ) },
                 label = { Text(item) },
                 selected = selectedItem == index,
-                onClick = { selectedItem = index }
+                onClick = {
+                    selectedItem = index
+                    if (index==1){
+                        navController.navigate("homeScreen")
+                    }else if (index==0){
+                        navController.navigate("firstPage")
+                    }
+                }
             )
         }
     }
@@ -269,7 +277,6 @@ fun DefaultPreview() {
 fun body() {
     AppTheme {
         val navController = rememberNavController()
-        
         myNavHost(navController = navController)
     }
 }

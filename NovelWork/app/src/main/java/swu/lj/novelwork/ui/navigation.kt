@@ -5,6 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import swu.lj.novelwork.firstPage
+import swu.lj.novelwork.ui.advScreen.advScreen
+import swu.lj.novelwork.ui.homeScreen.Message
+import swu.lj.novelwork.ui.homeScreen.homeScreen
+import swu.lj.novelwork.ui.rankScreen.rankScreen
 import swu.lj.novelwork.ui.sortScreen.sortScreen
 
 class navigation {
@@ -20,11 +24,25 @@ fun myNavHost(
         navController = navController,
         startDestination = "firstPage"
     ) {
+        //首页
         composable("firstPage") {
             firstPage(navController = navController)
         }
+        //分类
         composable("sortScreen") {
             sortScreen(navController = navController)
+        }
+        //个人页
+        composable("homeScreen") {
+            homeScreen(navController = navController, Message("Android", "Composes我书书籍的的就飞机的诺斯基夫齐我觉得是的肌地方但是肤萨顿峰时代的萨顿峰时间地方简单发生的发萨顿峰"))
+        }
+        //榜单页
+        composable("rankScreen") {
+            rankScreen(navController = navController)
+        }
+        //推荐页
+        composable("advScreen") {
+            advScreen(navController = navController)
         }
     }
 }
