@@ -1,5 +1,7 @@
 package swu.lj.novelwork.ui.homeScreen
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
@@ -32,6 +34,7 @@ data class Message(val author: String, val body: String)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun homeScreen(navController: NavController,msg:Message) {
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -75,57 +78,62 @@ fun homeScreen(navController: NavController,msg:Message) {
 fun personInfo(msg:Message){
     Row(modifier = Modifier
         .fillMaxWidth(1f)
-        .height(200.dp)
-        .padding(all = 8.dp)) {
-        Image(
-            painter = painterResource(R.drawable.home),
-            contentDescription = null,
+        .padding(all = 8.dp)
+        .clip(RoundedCornerShape(15.dp))
+        .background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
+
+    ) {
+        Row(
             modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colors.secondaryVariant, CircleShape)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
+            .fillMaxWidth(1f)
+                .padding(5.dp)) {
+            Image(
+                painter = painterResource(R.drawable.home),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .border(1.5.dp, MaterialTheme.colors.secondaryVariant, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
 
-        // We keep track if the message is expanded or not in this
-        // variable
-        var isExpanded by remember { mutableStateOf(false) }
-        // surfaceColor will be updated gradually from one color to the other
-        val surfaceColor by animateColorAsState(
-            if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface,
-        )
 
-        // We toggle the isExpanded variable when we click on this Column
-        Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
-            Text(
-                text = msg.author,
-                fontSize = 30.sp,
-                color = MaterialTheme.colors.secondaryVariant,
-                style = MaterialTheme.typography.subtitle2
+            var isExpanded by remember { mutableStateOf(false) }
+            val surfaceColor by animateColorAsState(
+                if (isExpanded) androidx.compose.material3.MaterialTheme.colorScheme.background else androidx.compose.material3.MaterialTheme.colorScheme.background,
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                elevation = 1.dp,
-                // surfaceColor color will be changing gradually from primary to surface
-                color = surfaceColor,
-                // animateContentSize will change the Surface size gradually
-                modifier = Modifier
-                    .animateContentSize()
-                    .padding(1.dp)
-            ) {
+            // We toggle the isExpanded variable when we click on this Column
+            Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
                 Text(
-                    text = msg.body,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(all = 4.dp),
-                    // If the message is expanded, we display all its content
-                    // otherwise we only display the first line
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 1,
-                    style = MaterialTheme.typography.body2
+                    text = msg.author,
+                    fontSize = 30.sp,
+                    color = MaterialTheme.colors.secondaryVariant,
+                    style = MaterialTheme.typography.subtitle2
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    elevation = 1.dp,
+                    // surfaceColor color will be changing gradually from primary to surface
+                    color = surfaceColor,
+                    // animateContentSize will change the Surface size gradually
+                    modifier = Modifier
+                        .animateContentSize()
+                        .padding(1.dp)
+                ) {
+                    Text(
+                        text = msg.body,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(all = 4.dp),
+                        maxLines = if (isExpanded) Int.MAX_VALUE else 1,
+                        style = MaterialTheme.typography.body2
+                    )
+                }
             }
+
         }
     }
 }

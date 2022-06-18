@@ -104,7 +104,6 @@ fun firstPage(navController: NavController) {
                                 .padding(15.dp, 10.dp, 15.dp, 10.dp)
                                 .clip(RoundedCornerShape(15.dp))
                         )
-
                     }
                     //icon图片
                     Row() {
@@ -122,14 +121,14 @@ fun firstPage(navController: NavController) {
                         )
                         Image(
                             painter = painterResource(id = R.drawable.tongji),
-                            contentDescription = "榜单",
+                            contentDescription = "我的书架",
                             Modifier
                                 .padding(40.dp, 10.dp, 30.dp, 5.dp)
                                 .clip(CircleShape)
                                 .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
                                 .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
                                 .size(55.dp)
-                                .clickable { navController.navigate("rankScreen") }
+                                .clickable { navController.navigate("bookShellScreen") }
                         )
                         Image(
                             painter = painterResource(id = R.drawable.remen),
@@ -147,7 +146,7 @@ fun firstPage(navController: NavController) {
                     //icon文字
                     Row() {
                         iconText(text = "分类")
-                        iconText(text = "榜单")
+                        iconText(text = "书架")
                         iconText(text = "推荐")
                     }
                     //推荐box
@@ -165,17 +164,17 @@ fun firstPage(navController: NavController) {
                             item {
                                 Row() {
                                     for (i in 1..2) {
-                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i))
+                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i),navController)
                                     }
                                 }
                                 Row() {
                                     for (i in 3..4) {
-                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i))
+                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i),navController)
                                     }
                                 }
                                 Row() {
                                     for (i in 5..6) {
-                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i))
+                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i),navController)
                                     }
                                 }
                             }
@@ -203,8 +202,8 @@ fun iconText(text:String) {
 }
 //推荐card设置
 @Composable
-fun adviceCard(jsonData:JSONObject) {
-    Column() {
+fun adviceCard(jsonData:JSONObject,navController:NavController) {
+    Column(modifier = Modifier.clickable { navController.navigate("bookScreen") }) {
 //
         Image(
             painter = painterResource(id = jsonData.getInt("image")),
@@ -215,7 +214,6 @@ fun adviceCard(jsonData:JSONObject) {
                 .height(170.dp)
                 .clip(RoundedCornerShape(15.dp)),
             contentScale = ContentScale.Crop,
-
             )
         //title
         Text(
