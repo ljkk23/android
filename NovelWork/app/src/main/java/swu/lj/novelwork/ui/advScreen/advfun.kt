@@ -73,7 +73,7 @@ fun advScreen(navController: NavController) {
             ) {
 
                 for (i in 0..20){
-                        personInfo(msg = Message("小说title","小说body"))
+                        personInfo(msg = Message("小说title","小说body"),"bookScreen",navController)
                 }
 
             }

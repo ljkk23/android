@@ -10,6 +10,7 @@ import swu.lj.novelwork.ui.bookScreen.bookScreen
 import swu.lj.novelwork.ui.bookShellScreen.bookShellScreen
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.homeScreen
+import swu.lj.novelwork.ui.readBookScreen.readBookScreen
 import swu.lj.novelwork.ui.sortScreen.sortScreen
 
 class navigation {
@@ -45,9 +46,13 @@ fun myNavHost(
         composable("advScreen") {
             advScreen(navController = navController)
         }
-        //推荐页
+        //书籍详情页
         composable("bookScreen") {
             bookScreen(navController = navController)
+        }
+        //书籍详情页
+        composable("readBookScreen") {
+            readBookScreen(navController = navController)
         }
     }
 }

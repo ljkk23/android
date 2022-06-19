@@ -63,7 +63,7 @@ fun homeScreen(navController: NavController,msg:Message) {
            LazyColumn(modifier = Modifier.padding(innerPadding)
            ){
                item {
-                   personInfo(msg = Message("刘剑","我是一个帅哥。而且还很的的浮点数 浮点数 的缩放撒旦发萨顿峰爱上发萨顿峰聪明"))
+                   personInfo(msg = Message("刘剑","我是一个帅哥。而且还很的的浮点数 浮点数 的缩放撒旦发萨顿峰爱上发萨顿峰聪明"),"homeScreen",navController)
                }
            }
 
@@ -75,7 +75,7 @@ fun homeScreen(navController: NavController,msg:Message) {
     )
 }
 @Composable
-fun personInfo(msg:Message){
+fun personInfo(msg:Message,routeDest:String,navController: NavController){
     Row(modifier = Modifier
         .fillMaxWidth(1f)
         .padding(all = 8.dp)
@@ -94,6 +94,7 @@ fun personInfo(msg:Message){
                     .size(80.dp)
                     .clip(CircleShape)
                     .border(1.5.dp, MaterialTheme.colors.secondaryVariant, CircleShape)
+                    .clickable { navController.navigate(routeDest) }
             )
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -104,12 +105,13 @@ fun personInfo(msg:Message){
             )
 
             // We toggle the isExpanded variable when we click on this Column
-            Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
+            Column() {
                 Text(
                     text = msg.author,
                     fontSize = 30.sp,
                     color = MaterialTheme.colors.secondaryVariant,
-                    style = MaterialTheme.typography.subtitle2
+                    style = MaterialTheme.typography.subtitle2,
+                    modifier = Modifier.clickable { navController.navigate(routeDest) }
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -123,6 +125,7 @@ fun personInfo(msg:Message){
                     modifier = Modifier
                         .animateContentSize()
                         .padding(1.dp)
+                        .clickable { isExpanded = !isExpanded }
                 ) {
                     Text(
                         text = msg.body,

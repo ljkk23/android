@@ -73,9 +73,10 @@ fun bookShellScreen(navController: NavController) {
                     .padding(innerPadding)
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(rememberScrollState())
+
             ) {
                 for (i in 0..10) {
-                    bookShellItem(bookShellItemMessage("title", 2, 10))
+                    bookShellItem(bookShellItemMessage("title", 2, 10),"bookScreen",navController)
                 }
             }
         }
@@ -83,7 +84,7 @@ fun bookShellScreen(navController: NavController) {
 }
 
 @Composable
-fun bookShellItem(msg:bookShellItemMessage){
+fun bookShellItem(msg:bookShellItemMessage,routeDest:String,navController: NavController){
     Row(modifier = Modifier
         .fillMaxWidth(1f)
         .padding(all = 8.dp)
@@ -93,7 +94,8 @@ fun bookShellItem(msg:bookShellItemMessage){
         Row(
             modifier = Modifier
                 .fillMaxWidth(1f)
-                .padding(5.dp)) {
+                .padding(5.dp)
+                .clickable { navController.navigate(routeDest) }) {
             Image(
                 painter = painterResource(R.drawable.home),
                 contentDescription = null,

@@ -1,5 +1,7 @@
 package swu.lj.novelwork.ui.bookScreen
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.R
 import androidx.compose.foundation.layout.*
@@ -8,10 +10,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -22,9 +24,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import swu.lj.novelwork.DB
 import swu.lj.novelwork.adviceCard
+import swu.lj.novelwork.navigationBar
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.personInfo
 
@@ -51,17 +56,10 @@ fun bookScreen(navController: NavController) {
                         )
                     }
                 },
-                //搜索icon
-                actions = {
-                    IconButton(onClick = { /* TODO:搜索*/ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Localized description",
-                            Modifier.size(40.dp)
-                        )
-                    }
-                }
             )
+        },
+        bottomBar = {
+            bookNavigationBar(navController)
         },
         content = { innerPadding ->
             Column(
@@ -105,7 +103,7 @@ fun bookScreen(navController: NavController) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(1f)
-                        .size(400.dp)
+                        //.size(400.dp)
                         .padding(16.dp)
                         .clip(RoundedCornerShape(15.dp))
                         //.background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
@@ -121,12 +119,12 @@ fun bookScreen(navController: NavController) {
                                 .padding(10.dp, 16.dp, 0.dp, 0.dp)
                         )
                         Text(
-                            text ="故事的开始是这个同样的",
+                            text ="  故事的开始故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的",
                             fontSize = 20.sp,
                             fontFamily = FontFamily.SansSerif,
                             modifier = Modifier
                                 .fillMaxWidth(1f)
-                                .padding(60.dp, 16.dp, 0.dp, 0.dp)
+                                .padding(0.dp, 16.dp, 0.dp, 0.dp)
                         )
 
                     }
@@ -136,6 +134,47 @@ fun bookScreen(navController: NavController) {
 
         }
     )
+}
+
+
+@Composable
+fun bookNavigationBar(navController: NavController) {
+    var selectedItem by remember { mutableStateOf(0) }
+    val items = listOf("立即阅读", "书架")
+    //是否加入书架，0加入，1未加入
+    var bookShellItem by remember { mutableStateOf(false) }
+
+    NavigationBar() {
+        items.forEachIndexed { index, item ->
+            NavigationBarItem(
+                modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                icon = { Icon(
+                    painter = painterResource(id = if (index==0){swu.lj.novelwork.R.drawable.bofang}else{swu.lj.novelwork.R.drawable.shoucang}
+
+                    ),
+                    tint =
+                    if (bookShellItem) {
+                            Color.Black
+                        } else {
+                            Color.White
+                        }
+                    ,
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                ) },
+                label = { Text(item) },
+                selected = selectedItem == index,
+                onClick = {
+                    selectedItem = index
+                    if (index==1){
+                        bookShellItem=!bookShellItem
+                    }else if (index==0){
+                        navController.navigate("readBookScreen")
+                    }
+                }
+            )
+        }
+    }
 }
 
 
