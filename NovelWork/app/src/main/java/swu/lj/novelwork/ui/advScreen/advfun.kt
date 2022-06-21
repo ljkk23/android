@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import swu.lj.novelwork.DB
 import swu.lj.novelwork.adviceCard
 import swu.lj.novelwork.iconText
 import swu.lj.novelwork.navigationBar

@@ -27,15 +27,17 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import swu.lj.novelwork.DB
+import org.json.JSONObject
 import swu.lj.novelwork.adviceCard
+import swu.lj.novelwork.entity.BookShell
 import swu.lj.novelwork.navigationBar
+import swu.lj.novelwork.testDB
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.personInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun bookScreen(navController: NavController) {
+fun bookScreen(navController: NavController,msg:JSONObject) {
     Scaffold(
 
         topBar = {
@@ -59,7 +61,7 @@ fun bookScreen(navController: NavController) {
             )
         },
         bottomBar = {
-            bookNavigationBar(navController)
+            bookNavigationBar(navController,msg)
         },
         content = { innerPadding ->
             Column(
@@ -138,19 +140,18 @@ fun bookScreen(navController: NavController) {
 
 
 @Composable
-fun bookNavigationBar(navController: NavController) {
+fun bookNavigationBar(navController: NavController,msg: JSONObject) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("立即阅读", "书架")
-    //是否加入书架，0加入，1未加入
+    //是否加入书架，true加入，false未加入
     var bookShellItem by remember { mutableStateOf(false) }
-
+    val bookShell=BookShell(msg.getString("bookTitle"),msg.getString("coveUrl"),msg.getString("bookAuthor"),msg.getInt("readChapter"))
     NavigationBar() {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 modifier = Modifier.background(MaterialTheme.colorScheme.background),
                 icon = { Icon(
                     painter = painterResource(id = if (index==0){swu.lj.novelwork.R.drawable.bofang}else{swu.lj.novelwork.R.drawable.shoucang}
-
                     ),
                     tint =
                     if (bookShellItem) {
@@ -167,6 +168,7 @@ fun bookNavigationBar(navController: NavController) {
                 onClick = {
                     selectedItem = index
                     if (index==1){
+                        testDB.insertBookShell(bookShell)
                         bookShellItem=!bookShellItem
                     }else if (index==0){
                         navController.navigate("readBookScreen")
@@ -182,6 +184,6 @@ fun bookNavigationBar(navController: NavController) {
 @Composable
 fun bookSreenView(){
     val navController = rememberNavController()
-    bookScreen(navController = navController)
+    bookScreen(navController = navController, msg = JSONObject())
 
 }

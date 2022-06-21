@@ -1,23 +1,24 @@
 package swu.lj.novelwork
 
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.Nullable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -31,22 +32,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import org.json.JSONObject
+import swu.lj.novelwork.entity.BookShell
 import swu.lj.novelwork.ui.myNavHost
 import swu.lj.novelwork.ui.theme.AppTheme
-import swu.lj.novelwork.ui.tools.dataTools
+import swu.lj.novelwork.tools.dataTools
+import java.security.AccessController.getContext
 
 
-val DB=dataTools()
+
+val testDB=dataTools(getmainContext())
 
 class MainActivity : ComponentActivity() {
 
+    companion object{
+        @SuppressLint("StaticFieldLeak")
+        lateinit var mainContext: Context ;
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mainContext= applicationContext;
         setContent {
             body()
         }
     }
+}
+fun getmainContext():Context{
+    return  MainActivity.mainContext
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,7 +109,8 @@ fun firstPage(navController: NavController) {
                         .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    //Spacer(modifier = Modifier.size(10.dp))
+                var booklist:List<BookShell> =testDB.getBookShell()
+                Log.e(TAG, "firstPage: $booklist")
                     Row() {
                         Image(
                             painter = painterResource(id = R.drawable.home),
@@ -159,24 +174,14 @@ fun firstPage(navController: NavController) {
                             .background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
 
                     ) {
-                        val cardJsonArray = DB.getAdviceCard()
+                        val cardJsonArray = testDB.getAdviceCard()
                         LazyColumn {
                             item {
                                 Row() {
-                                    for (i in 1..2) {
-                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i),navController)
-                                    }
+                                    adviceCard(jsonData = cardJsonArray.getJSONObject(1),navController)
                                 }
-                                Row() {
-                                    for (i in 3..4) {
-                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i),navController)
-                                    }
-                                }
-                                Row() {
-                                    for (i in 5..6) {
-                                        adviceCard(jsonData = cardJsonArray.getJSONObject(i),navController)
-                                    }
-                                }
+
+
                             }
                         }
 
@@ -203,7 +208,8 @@ fun iconText(text:String) {
 //推荐card设置
 @Composable
 fun adviceCard(jsonData:JSONObject,navController:NavController) {
-    Column(modifier = Modifier.clickable { navController.navigate("bookScreen") }) {
+
+    Column(modifier = Modifier.clickable { navController.navigate("bookScreen?book=") }) {
 //
         Image(
             painter = painterResource(id = jsonData.getInt("image")),

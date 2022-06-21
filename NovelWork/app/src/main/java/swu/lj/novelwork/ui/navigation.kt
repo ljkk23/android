@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import org.json.JSONObject
 import swu.lj.novelwork.firstPage
 import swu.lj.novelwork.ui.advScreen.advScreen
 import swu.lj.novelwork.ui.bookScreen.bookScreen
@@ -47,8 +48,8 @@ fun myNavHost(
             advScreen(navController = navController)
         }
         //书籍详情页
-        composable("bookScreen") {
-            bookScreen(navController = navController)
+        composable("bookScreen?book={book}") {backStackEntry ->
+            bookScreen(navController = navController,JSONObject(backStackEntry.arguments?.getString("book").toString()))
         }
         //书籍详情页
         composable("readBookScreen") {
