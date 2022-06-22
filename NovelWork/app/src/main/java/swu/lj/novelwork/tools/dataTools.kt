@@ -29,8 +29,9 @@ class dataTools (context: Context){
 
         var allbookShell:List<BookShell> = bookShellDao.getAll()
         val myjsonArray=JSONArray()
-        val json=JSONObject()
+
         allbookShell.forEach {item->
+            val json=JSONObject()
             json.put("bookTitle", item.bookTitle)
             json.put("image", R.drawable.bookcover)
             json.put("introduction",item.introduction)
@@ -38,6 +39,7 @@ class dataTools (context: Context){
             json.put("readChapter",3)
             myjsonArray.put(json)
         }
+        Log.e(TAG, "getBookShell:List<BookShell> $allbookShell")
 
         return myjsonArray
     }

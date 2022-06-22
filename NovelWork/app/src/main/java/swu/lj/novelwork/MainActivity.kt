@@ -33,16 +33,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
+import org.json.JSONArray
 import org.json.JSONObject
 import swu.lj.novelwork.entity.BookShell
+import swu.lj.novelwork.tools.NetWorktools
 import swu.lj.novelwork.ui.myNavHost
 import swu.lj.novelwork.ui.theme.AppTheme
 import swu.lj.novelwork.tools.dataTools
 import java.security.AccessController.getContext
-
+import kotlin.concurrent.thread
 
 
 val testDB=dataTools(getmainContext())
+val netWorktools:NetWorktools = NetWorktools()
 
 class MainActivity : ComponentActivity() {
 
@@ -54,6 +57,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mainContext= applicationContext;
+        netWorktools.getAdvBooks()
         setContent {
             body()
         }
@@ -66,8 +70,9 @@ fun getmainContext():Context{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun firstPage(navController: NavController) {
+    var getFinished by remember { mutableStateOf(0) }
+    var cardJsonArray by remember { mutableStateOf(JSONArray()) }
     Scaffold(
-
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
@@ -100,97 +105,111 @@ fun firstPage(navController: NavController) {
         },
         bottomBar = {
                     navigationBar(navController)
-    },
-        content = { innerPadding ->
-            Column(
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                var jsonArray=testDB.getBookShell()
-                Log.e(TAG, "firstPage: $jsonArray")
-                    Row() {
-                        Image(
-                            painter = painterResource(id = R.drawable.home),
-                            contentDescription = "概述",
-                            Modifier
-                                .padding(15.dp, 10.dp, 15.dp, 10.dp)
-                                .clip(RoundedCornerShape(15.dp))
-                        )
-                    }
-                    //icon图片
-                    Row() {
-                        Image(
+    }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+        ) {
+            var jsonArray = testDB.getBookShell()
+            Log.e(TAG, "firstPage: $jsonArray")
+            Row() {
+                Image(
+                    painter = painterResource(id = R.drawable.home),
+                    contentDescription = "概述",
+                    Modifier
+                        .padding(15.dp, 10.dp, 15.dp, 10.dp)
+                        .clip(RoundedCornerShape(15.dp))
+                )
+            }
+            //icon图片
+            Row() {
+                Image(
 
-                            painter = painterResource(id = R.drawable.sort),
-                            contentDescription = "分类",
-                            Modifier
-                                .padding(50.dp, 10.dp, 30.dp, 5.dp)
-                                .clip(CircleShape)
-                                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-                                .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
-                                .size(55.dp)
-                                .clickable { navController.navigate("sortScreen") }
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.tongji),
-                            contentDescription = "我的书架",
-                            Modifier
-                                .padding(40.dp, 10.dp, 30.dp, 5.dp)
-                                .clip(CircleShape)
-                                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-                                .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
-                                .size(55.dp)
-                                .clickable { navController.navigate("bookShellScreen") }
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.remen),
-                            contentDescription = "推荐",
-                            Modifier
-                                .padding(40.dp, 10.dp, 30.dp, 5.dp)
-                                .clip(CircleShape)
-                                .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
-                                .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
-                                .size(55.dp)
-                                .clickable { navController.navigate("advScreen") }
-                        )
+                    painter = painterResource(id = R.drawable.sort),
+                    contentDescription = "分类",
+                    Modifier
+                        .padding(50.dp, 10.dp, 30.dp, 5.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+                        .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
+                        .size(55.dp)
+                        .clickable { navController.navigate("sortScreen") }
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.tongji),
+                    contentDescription = "我的书架",
+                    Modifier
+                        .padding(40.dp, 10.dp, 30.dp, 5.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+                        .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
+                        .size(55.dp)
+                        .clickable { navController.navigate("bookShellScreen") }
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.remen),
+                    contentDescription = "推荐",
+                    Modifier
+                        .padding(40.dp, 10.dp, 30.dp, 5.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
+                        .background(color = androidx.compose.material3.MaterialTheme.colorScheme.outline)
+                        .size(55.dp)
+                        .clickable { navController.navigate("advScreen") }
+                )
 
-                    }
-                    //icon文字
-                    Row() {
-                        iconText(text = "分类")
-                        iconText(text = "书架")
-                        iconText(text = "推荐")
-                    }
-                    //推荐box
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(1f)
-                            .size(400.dp)
-                            .padding(16.dp)
-                            .clip(RoundedCornerShape(15.dp))
-                            .background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
+            }
+            //icon文字
+            Row() {
+                iconText(text = "分类")
+                iconText(text = "书架")
+                iconText(text = "推荐")
+            }
+            //推荐box
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .size(400.dp)
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
 
-                    ) {
-                        val cardJsonArray = testDB.getAdviceCard()
-                       LazyColumn {
-                            item {
+            ) {
+
+                thread {
+                    cardJsonArray = netWorktools.getAdvBooks()
+                    getFinished = 1
+                    Log.e(TAG, "getAdvBooks: wanc",)
+                }
+                LazyColumn {
+                    item {
+                        if (cardJsonArray.length()!=0) {
+                            for (i in 0 until (cardJsonArray.length()/2)) {
+                                var conutI:Int=2*i
                                 Row() {
-                                    adviceCard(jsonData = cardJsonArray.getJSONObject(0),navController)
+                                    adviceCard(
+                                        jsonData = cardJsonArray.getJSONObject(conutI),
+                                        navController
+                                    )
+                                    adviceCard(
+                                        jsonData = cardJsonArray.getJSONObject(conutI+1),
+                                        navController
+                                    )
                                 }
-
-
                             }
                         }
-
-
                     }
-
                 }
 
+
+            }
+
         }
-    )
+
+    }
 }
 //icon的text
 @Composable

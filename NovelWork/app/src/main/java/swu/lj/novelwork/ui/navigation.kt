@@ -9,6 +9,7 @@ import swu.lj.novelwork.firstPage
 import swu.lj.novelwork.ui.advScreen.advScreen
 import swu.lj.novelwork.ui.bookScreen.bookScreen
 import swu.lj.novelwork.ui.bookShellScreen.bookShellScreen
+import swu.lj.novelwork.ui.chapterScreen.chapterScreen
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.homeScreen
 import swu.lj.novelwork.ui.readBookScreen.readBookScreen
@@ -51,9 +52,13 @@ fun myNavHost(
         composable("bookScreen?book={book}") {backStackEntry ->
             bookScreen(navController = navController,JSONObject(backStackEntry.arguments?.getString("book").toString()))
         }
+        //阅读书籍
+        composable("readBookScreen?url={url}") {backStackEntry ->
+            readBookScreen(navController = navController,JSONObject(backStackEntry.arguments?.getString("url").toString()))
+        }
         //书籍详情页
-        composable("readBookScreen") {
-            readBookScreen(navController = navController)
+        composable("chapterScreen?url={url}") {backStackEntry ->
+            chapterScreen(navController = navController,JSONObject(backStackEntry.arguments?.getString("url").toString()))
         }
     }
 }

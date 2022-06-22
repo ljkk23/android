@@ -1,5 +1,7 @@
 package swu.lj.novelwork.ui.advScreen
 
+import android.content.ContentValues
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.R
 import androidx.compose.foundation.layout.*
@@ -11,7 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -21,16 +23,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import org.json.JSONArray
+import org.json.JSONObject
 import swu.lj.novelwork.adviceCard
 import swu.lj.novelwork.iconText
 import swu.lj.novelwork.navigationBar
+import swu.lj.novelwork.testDB
+import swu.lj.novelwork.tools.NetWorktools
+import swu.lj.novelwork.ui.bookShellScreen.bookShellItem
+import swu.lj.novelwork.ui.bookShellScreen.bookShellItemMessage
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.personInfo
+import swu.lj.novelwork.ui.sortScreen.sortItem
 import swu.lj.novelwork.ui.sortScreen.sortScreen
+import swu.lj.novelwork.ui.sortScreen.sortShellItemMessage
+import kotlin.concurrent.thread
 
+
+val netWorktools: NetWorktools = NetWorktools()
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun advScreen(navController: NavController) {
+
+    var myJSONArray by remember { mutableStateOf(JSONArray()) }
     Scaffold(
 
         topBar = {
@@ -64,15 +79,26 @@ fun advScreen(navController: NavController) {
             )
         },
         content = { innerPadding ->
+            thread {
+                    myJSONArray = netWorktools.getAdvBooks()
+                    Log.e(ContentValues.TAG, "getAdvBooks里面: ",)
+                }
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
                     .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(rememberScrollState())
             ) {
-
-                for (i in 0..20){
-                        personInfo(msg = Message("小说title","小说body"),"bookScreen",navController)
+                //不能放在这里，会陷入循环
+//                thread {
+//                    myJSONArray = netWorktools.getAdvBooks()
+//                    Log.e(ContentValues.TAG, "getAdvBooks里面: ",)
+//                }
+                if (myJSONArray.length()!=0){
+                    for (i in 0 until myJSONArray.length()){
+                        var obj: JSONObject =myJSONArray.get(i) as JSONObject
+                        sortItem(sortShellItemMessage(obj.getInt("image"),obj.getString("bookTitle"),obj.getString("introduction")),"bookScreen",navController,obj)
+                    }
                 }
 
             }

@@ -144,7 +144,7 @@ fun bookNavigationBar(navController: NavController,msg: JSONObject) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("立即阅读", "书架")
     //是否加入书架，true加入，false未加入
-    val bookShell=BookShell(msg.getString("bookTitle"),msg.getInt("image"),msg.getString("introduction"),msg.getString("bookAuthor"),msg.getInt("readChapter"))
+    val bookShell=BookShell(msg.getString("bookTitle"),msg.getInt("image"),msg.getString("introduction"),msg.getString("bookAuthor"),msg.getInt("readChapter"),msg.getString("url"))
     var bookShellItem by remember { mutableStateOf(testDB.IsBookShell(bookShell.bookTitle)) }
     NavigationBar() {
         items.forEachIndexed { index, item ->
@@ -175,7 +175,9 @@ fun bookNavigationBar(navController: NavController,msg: JSONObject) {
                         }
                         bookShellItem=!bookShellItem
                     }else if (index==0){
-                        navController.navigate("readBookScreen")
+                        var urlJson = JSONObject();
+                        urlJson.put("url",msg.getString("url"))
+                        navController.navigate("chapterScreen?url=$urlJson")
                     }
                 }
             )

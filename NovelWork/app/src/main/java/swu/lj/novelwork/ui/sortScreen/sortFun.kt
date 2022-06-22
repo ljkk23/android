@@ -32,26 +32,31 @@ import org.json.JSONArray
 import org.json.JSONObject
 import swu.lj.novelwork.R
 import swu.lj.novelwork.testDB
+import swu.lj.novelwork.tools.NetWorktools
 import swu.lj.novelwork.ui.bookShellScreen.bookShellItem
 import swu.lj.novelwork.ui.bookShellScreen.bookShellItemMessage
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.homeScreen
 import swu.lj.novelwork.ui.homeScreen.personInfo
+import kotlin.concurrent.thread
 
 data class sortShellItemMessage(val coverUrl:Int,val title: String, val introduction: String)
 
+
+val netWorktools: NetWorktools = NetWorktools()
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun sortScreen(navController: NavController) {
     val mydatas = remember {
-        mutableStateListOf("玄幻", "爱情", "科幻", "现实", "武侠")
+        mutableStateListOf("玄幻", "都市", "历史", "科幻", "言情")
     }
+    var myJSONArray by remember { mutableStateOf(JSONArray()) }
+    var myBookType by remember { mutableStateOf("xuanhuan") }
     val state = rememberPagerState(
         initialPage = 0,//初始页码
     )
     val scope = rememberCoroutineScope()
     Scaffold(
-
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(
@@ -82,56 +87,80 @@ fun sortScreen(navController: NavController) {
                     }
                 }
             )
-        },
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .background(MaterialTheme.colorScheme.background)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Column {
-                    ScrollableTabRow(selectedTabIndex = state.currentPage,//展示的页码，和Pager的保持一致
-                        modifier = Modifier.background(color = Color.Green)) {
-                        mydatas.forEachIndexed { index, data ->
-                            Box(
-                                Modifier
-                                    .height(40.dp)
-                                    .width(100.dp)
-                                    .clickable {
-                                        scope.launch {
-                                            state.scrollToPage(
-                                                index,
-                                                0f
-                                            )//Tab被点击后让Pager中内容动画形式滑动到目标页
-                                        }
-                                    }, contentAlignment = Alignment.Center) {
-                                Text(text = data)
-                            }
-                        }
-                    }
-                    HorizontalPager(state = state,//Pager当前所在页数
-                        count = mydatas.size, modifier = Modifier.background(MaterialTheme.colorScheme.background)) { pagePosition ->
-                        Column() {
-                            val myJSONArray: JSONArray = testDB.getBookShell()
-                            if (myJSONArray.length()!=0){
-                                for (i in 0 until myJSONArray.length()){
-                                    var obj:JSONObject =myJSONArray.get(i) as JSONObject
-                                    sortItem(sortShellItemMessage(obj.getInt("image"),obj.getString("bookTitle"),obj.getString("introduction")),"bookScreen",navController,obj)
-                                }
-                            }
-                        }
-
-                    }
-                }
-
-                }
         }
-    )
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.background)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Column {
+                ScrollableTabRow(
+                    selectedTabIndex = state.currentPage,//展示的页码，和Pager的保持一致
+                    modifier = Modifier.background(color = Color.Green)
+                ) {
+                    mydatas.forEachIndexed { index, data ->
+                        Box(
+                            Modifier
+                                .height(40.dp)
+                                .width(100.dp)
+                                .clickable {
+                                    scope.launch {
+                                        state.scrollToPage(
+                                            index,
+                                            0f
+                                        )//Tab被点击后让Pager中内容动画形式滑动到目标页
+                                    }
+                                }, contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = data)
+                        }
+                    }
+                }
+                thread {
+                    myJSONArray = netWorktools.getsortBooks(myBookType)
+                    Log.e(TAG, "gsdfsdf: $myJSONArray",)
+                }
+                HorizontalPager(
+                    state = state,//Pager当前所在页数
+                    count = mydatas.size,
+                    modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                ) { pagePosition ->
+                    if (pagePosition==0){
+                        myBookType="xuanhuan"
+                    }else if (pagePosition==1){
+                        myBookType="dushi"
+                    }else if (pagePosition==2){
+                        myBookType="lishi"
+                    } else if (pagePosition==3){
+                        myBookType="kehuan"
+                    }else if (pagePosition==4){
+                        myBookType="yanqing"
+                    }
+                    Column() {
+                        //val myJSONArray: JSONArray = testDB.getBookShell()
+                        if (myJSONArray.length() != 0) {
+                            for (i in 0 until myJSONArray.length()) {
+                                var obj: JSONObject = myJSONArray.get(i) as JSONObject
+                                sortItem(
+                                    sortShellItemMessage(
+                                        obj.getInt("image"),
+                                        obj.getString("bookTitle"),
+                                        obj.getString("introduction")
+                                    ), "bookScreen", navController, obj
+                                )
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+    }
 
 }
-
-
 
 @Composable
 fun sortItem(msg:sortShellItemMessage,routeDest:String,navController: NavController,jsonData:JSONObject){
@@ -152,11 +181,15 @@ fun sortItem(msg:sortShellItemMessage,routeDest:String,navController: NavControl
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .border(1.5.dp, androidx.compose.material.MaterialTheme.colors.secondaryVariant, CircleShape)
+                    .border(
+                        1.5.dp,
+                        androidx.compose.material.MaterialTheme.colors.secondaryVariant,
+                        CircleShape
+                    )
                     .clickable { navController.navigate("$routeDest?book=$jsonData") }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            
+
             var isExpanded by remember { mutableStateOf(false) }
             val surfaceColor by animateColorAsState(
                 if (isExpanded) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.background,

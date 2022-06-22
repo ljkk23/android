@@ -33,7 +33,7 @@ import swu.lj.novelwork.entity.BookShell
 import swu.lj.novelwork.testDB
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.personInfo
-data class bookShellItemMessage(val coverUrl:Int,val title: String, val readChapter: Int?)
+data class bookShellItemMessage(val coverUrl:Int,val title: String, val readChapter: Int?,val url: String)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
@@ -83,7 +83,7 @@ fun bookShellScreen(navController: NavController) {
                 if (myJSONArray.length()!=0){
                     for (i in 0 until myJSONArray.length()){
                         var obj:JSONObject =myJSONArray.get(i) as JSONObject
-                        bookShellItem(bookShellItemMessage(obj.getInt("image"),obj.getString("bookTitle"),obj.getInt("readChapter")),"bookScreen",navController,obj)
+                        bookShellItem(bookShellItemMessage(obj.getInt("image"),obj.getString("bookTitle"),obj.getInt("readChapter"),obj.getString("url")),"bookScreen",navController,obj)
                     }
                 }
 
