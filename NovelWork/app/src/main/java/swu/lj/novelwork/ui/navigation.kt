@@ -40,7 +40,7 @@ fun myNavHost(
             homeScreen(navController = navController, Message("Android", "Composes我书书籍的的就飞机的诺斯基夫齐我觉得是的肌地方但是肤萨顿峰时代的萨顿峰时间地方简单发生的发萨顿峰"))
         }
         //榜单页
-        composable("bookShellScreen") {
+        composable("bookShellScreen?book={book}") {
             bookShellScreen(navController = navController)
         }
         //推荐页

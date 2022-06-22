@@ -26,10 +26,14 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
+import org.json.JSONArray
+import org.json.JSONObject
 import swu.lj.novelwork.R
+import swu.lj.novelwork.entity.BookShell
+import swu.lj.novelwork.testDB
 import swu.lj.novelwork.ui.homeScreen.Message
 import swu.lj.novelwork.ui.homeScreen.personInfo
-data class bookShellItemMessage(val title: String, val readChapter: Int,val allReadChapter: Int)
+data class bookShellItemMessage(val coverUrl:Int,val title: String, val readChapter: Int?)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
@@ -75,16 +79,21 @@ fun bookShellScreen(navController: NavController) {
                     .verticalScroll(rememberScrollState())
 
             ) {
-                for (i in 0..10) {
-                    bookShellItem(bookShellItemMessage("title", 2, 10),"bookScreen",navController)
+                val myJSONArray:JSONArray =testDB.getBookShell()
+                if (myJSONArray.length()!=0){
+                    for (i in 0 until myJSONArray.length()){
+                        var obj:JSONObject =myJSONArray.get(i) as JSONObject
+                        bookShellItem(bookShellItemMessage(obj.getInt("image"),obj.getString("bookTitle"),obj.getInt("readChapter")),"bookScreen",navController,obj)
+                    }
                 }
+
             }
         }
     )
 }
 
 @Composable
-fun bookShellItem(msg:bookShellItemMessage,routeDest:String,navController: NavController){
+fun bookShellItem(msg:bookShellItemMessage,routeDest:String,navController: NavController,jsonData:JSONObject){
     Row(modifier = Modifier
         .fillMaxWidth(1f)
         .padding(all = 8.dp)
@@ -95,9 +104,9 @@ fun bookShellItem(msg:bookShellItemMessage,routeDest:String,navController: NavCo
             modifier = Modifier
                 .fillMaxWidth(1f)
                 .padding(5.dp)
-                .clickable { navController.navigate(routeDest) }) {
+                .clickable { navController.navigate("$routeDest?book=$jsonData") }) {
             Image(
-                painter = painterResource(R.drawable.home),
+                painter = painterResource(id = msg.coverUrl),
                 contentDescription = null,
                 modifier = Modifier
                     .size(80.dp)
@@ -136,12 +145,6 @@ fun bookShellItem(msg:bookShellItemMessage,routeDest:String,navController: NavCo
                     Column() {
                         Text(
                             text = "已读章节："+msg.readChapter.toString(),
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(all = 4.dp),
-                            style = androidx.compose.material.MaterialTheme.typography.body2
-                        )
-                        Text(
-                            text = "当前所有章节："+msg.allReadChapter.toString(),
                             fontSize = 15.sp,
                             modifier = Modifier.padding(all = 4.dp),
                             style = androidx.compose.material.MaterialTheme.typography.body2

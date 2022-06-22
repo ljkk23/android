@@ -72,7 +72,7 @@ fun bookScreen(navController: NavController,msg:JSONObject) {
             ) {
                 Row {
                     Image(
-                        painter = painterResource(id = swu.lj.novelwork.R.drawable.home2),
+                        painter = painterResource(id = msg.getInt("image")),
                         contentDescription = "概述",
                         Modifier
                             .width(170.dp)
@@ -85,7 +85,7 @@ fun bookScreen(navController: NavController,msg:JSONObject) {
                     Column() {
                         Spacer(modifier = Modifier.size(40.dp))
                         Text(
-                            text ="书名：《书的书名》 ",
+                            text =msg.getString("bookTitle"),
                             fontSize = 20.sp,
                             fontFamily = FontFamily.SansSerif,
                             modifier = Modifier
@@ -93,7 +93,7 @@ fun bookScreen(navController: NavController,msg:JSONObject) {
                                 .padding(10.dp, 16.dp, 0.dp, 0.dp)
                         )
                         Text(
-                            text ="作者：书的作者 ",
+                            text =msg.getString("bookAuthor"),
                             fontSize = 15.sp,
                             fontFamily = FontFamily.SansSerif,
                             modifier = Modifier
@@ -121,7 +121,7 @@ fun bookScreen(navController: NavController,msg:JSONObject) {
                                 .padding(10.dp, 16.dp, 0.dp, 0.dp)
                         )
                         Text(
-                            text ="  故事的开始故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的故事的开始是这个同样的",
+                            text =msg.getString("introduction"),
                             fontSize = 20.sp,
                             fontFamily = FontFamily.SansSerif,
                             modifier = Modifier
@@ -144,8 +144,8 @@ fun bookNavigationBar(navController: NavController,msg: JSONObject) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("立即阅读", "书架")
     //是否加入书架，true加入，false未加入
-    var bookShellItem by remember { mutableStateOf(false) }
-    val bookShell=BookShell(msg.getString("bookTitle"),msg.getString("coveUrl"),msg.getString("bookAuthor"),msg.getInt("readChapter"))
+    val bookShell=BookShell(msg.getString("bookTitle"),msg.getInt("image"),msg.getString("introduction"),msg.getString("bookAuthor"),msg.getInt("readChapter"))
+    var bookShellItem by remember { mutableStateOf(testDB.IsBookShell(bookShell.bookTitle)) }
     NavigationBar() {
         items.forEachIndexed { index, item ->
             NavigationBarItem(
@@ -168,7 +168,11 @@ fun bookNavigationBar(navController: NavController,msg: JSONObject) {
                 onClick = {
                     selectedItem = index
                     if (index==1){
-                        testDB.insertBookShell(bookShell)
+                        if (!bookShellItem){
+                            testDB.insertBookShell(bookShell)
+                        }else{
+                            testDB.deleteBookShell(bookShell)
+                        }
                         bookShellItem=!bookShellItem
                     }else if (index==0){
                         navController.navigate("readBookScreen")

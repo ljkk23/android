@@ -66,7 +66,6 @@ fun getmainContext():Context{
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun firstPage(navController: NavController) {
-
     Scaffold(
 
         topBar = {
@@ -109,8 +108,8 @@ fun firstPage(navController: NavController) {
                         .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                         .verticalScroll(rememberScrollState())
                 ) {
-                var booklist:List<BookShell> =testDB.getBookShell()
-                Log.e(TAG, "firstPage: $booklist")
+                var jsonArray=testDB.getBookShell()
+                Log.e(TAG, "firstPage: $jsonArray")
                     Row() {
                         Image(
                             painter = painterResource(id = R.drawable.home),
@@ -175,10 +174,10 @@ fun firstPage(navController: NavController) {
 
                     ) {
                         val cardJsonArray = testDB.getAdviceCard()
-                        LazyColumn {
+                       LazyColumn {
                             item {
                                 Row() {
-                                    adviceCard(jsonData = cardJsonArray.getJSONObject(1),navController)
+                                    adviceCard(jsonData = cardJsonArray.getJSONObject(0),navController)
                                 }
 
 
@@ -209,7 +208,7 @@ fun iconText(text:String) {
 @Composable
 fun adviceCard(jsonData:JSONObject,navController:NavController) {
 
-    Column(modifier = Modifier.clickable { navController.navigate("bookScreen?book=") }) {
+    Column(modifier = Modifier.clickable { navController.navigate("bookScreen?book=$jsonData") }) {
 //
         Image(
             painter = painterResource(id = jsonData.getInt("image")),
@@ -223,7 +222,7 @@ fun adviceCard(jsonData:JSONObject,navController:NavController) {
             )
         //title
         Text(
-            text = jsonData.getString("title"),
+            text = jsonData.getString("bookTitle"),
             fontSize = 15.sp,
             fontFamily = FontFamily.SansSerif,
             modifier = Modifier.padding(30.dp, 5.dp)
